@@ -1,29 +1,25 @@
-// src/components/AddMemberForm.js
-import React, { useState, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
-// --- THE FIX IS HERE ---
-// Import each function from its specific service file.
-import { searchUserByEmail } from '../api/userService';
-import { addUsersToGroup } from '../api/groupService'; // Assuming this is in groupService.js
+import React, { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { searchUserByEmail } from "../api/userService";
+import { addUsersToGroup } from "../api/groupService";
 
 const AddMemberForm = ({ groupId, onMemberAdded }) => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [foundUser, setFoundUser] = useState(null);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { user: currentUser } = useContext(AuthContext);
 
   const handleSearch = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setMessage('');
+    setMessage("");
     setFoundUser(null);
     try {
-      // This call will now work correctly
       const result = await searchUserByEmail(email, currentUser.token);
       setFoundUser(result);
     } catch (error) {
-      setMessage(error.message || 'Search failed.');
+      setMessage(error.message || "Search failed.");
     } finally {
       setIsLoading(false);
     }
@@ -32,15 +28,15 @@ const AddMemberForm = ({ groupId, onMemberAdded }) => {
   const handleAddMember = async () => {
     if (!foundUser) return;
     setIsLoading(true);
-    setMessage('');
+    setMessage("");
     try {
       await addUsersToGroup(groupId, [foundUser._id], currentUser.token);
       setMessage(`Successfully added ${foundUser.name} to the group.`);
       onMemberAdded();
       setFoundUser(null);
-      setEmail('');
+      setEmail("");
     } catch (error) {
-      setMessage('Failed to add member.');
+      setMessage("Failed to add member.");
     } finally {
       setIsLoading(false);
     }
@@ -49,7 +45,8 @@ const AddMemberForm = ({ groupId, onMemberAdded }) => {
   return (
     <div className="mt-6 p-4 border rounded-lg shadow-sm bg-white">
       <h3 className="text-xl font-semibold mb-4">Add New Member</h3>
-      <form onSubmit={handleSearch} className="flex gap-2">
+
+      <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2">
         <input
           type="email"
           value={email}
@@ -60,10 +57,10 @@ const AddMemberForm = ({ groupId, onMemberAdded }) => {
         />
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-blue-300"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-blue-300"
           disabled={isLoading}
         >
-          {isLoading ? 'Searching...' : 'Search'}
+          {isLoading ? "Searching..." : "Search"}
         </button>
       </form>
       {message && <p className="mt-4 text-sm text-gray-600">{message}</p>}
